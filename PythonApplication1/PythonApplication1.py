@@ -6,6 +6,7 @@ import tkinter as tk
 from tkinter import messagebox
  
 class cube(object):
+    
     rows = 20
     w = 500
     def __init__(self,start,dirnx=1,dirny=0,color=(255, 171, 42)):
@@ -87,6 +88,7 @@ class snake(object):
        
  
     def reset(self, pos):
+        start.play()
         self.head = cube(pos)
         self.body = []
         self.body.append(self.head)
@@ -169,14 +171,18 @@ def message_box(subject, content):
  
  
 def main():
-    global width, rows, s, snack
+    global width, rows, s, snack, bell, dead, start
+    pygame.mixer.init()
+    start = pygame.mixer.Sound("Start.wav")
     width = 500
     rows = 20
     win = pygame.display.set_mode((width, width))
     s = snake((255, 171, 42), (10,10))
+    start.play()
     snack = cube(randomSnack(rows, s), color=(83, 228, 174))
     flag = True
- 
+    bell = pygame.mixer.Sound("Token.wav")
+    dead = pygame.mixer.Sound("Dead.wav")
     clock = pygame.time.Clock()
    
     while flag:
@@ -185,15 +191,17 @@ def main():
         s.move()
         if s.body[0].pos == snack.pos:
             s.addCube()
+            bell.play()
             snack = cube(randomSnack(rows, s), color=(83, 228, 174))
  
         for x in range(len(s.body)):
             if s.body[x].pos in list(map(lambda z:z.pos,s.body[x+1:])):
+                dead.play()
                 print("Score: ", len(s.body))
                 message_box("You Lost!", "Play again...")
                 s.reset((10,10))
                 break
-        #win.fill([244, 82, 255])
+        
         pygame.display.update()  
         redrawWindow(win)
  
