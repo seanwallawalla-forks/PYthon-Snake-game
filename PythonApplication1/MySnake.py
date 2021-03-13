@@ -1,9 +1,9 @@
-#making a python snake game.  PYthon
+# this was one of the first things I made in python.  I'm going to update it and use it to train my ML model for my senior project at fullsail.
 import math
-import random
-import pygame
+import random as rnd
+import pygame as pyg
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox as msg
  
 class cube(object):
     
@@ -25,14 +25,14 @@ class cube(object):
         i = self.pos[0]
         j = self.pos[1]
  
-        pygame.draw.rect(surface, self.color, (i*dis+1,j*dis+1, dis-2, dis-2))
+        pyg.draw.rect(surface, self.color, (i*dis+1,j*dis+1, dis-2, dis-2))
         if eyes:
             centre = dis//2
             radius = 3
             circleMiddle = (i*dis+centre-radius,j*dis+8)
             circleMiddle2 = (i*dis + dis -radius*2, j*dis+8)
-            pygame.draw.circle(surface, (0,0,0), circleMiddle, radius)
-            pygame.draw.circle(surface, (0,0,0), circleMiddle2, radius)
+            pyg.draw.circle(surface, (0,0,0), circleMiddle, radius)
+            pyg.draw.circle(surface, (0,0,0), circleMiddle2, radius)
        
 class snake(object):
     body = []
@@ -45,35 +45,35 @@ class snake(object):
         self.dirny = 1
  
     def move(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
+        for event in pyg.event.get():
+            if event.type == pyg.QUIT:
+                pyg.quit()
  
-            keys = pygame.key.get_pressed()
+            keys = pyg.key.get_pressed()
  
             for key in keys:
-                if keys[pygame.K_LEFT]:
+                if keys[pyg.K_LEFT]:
                     self.dirnx = -1
                     self.dirny = 0
                     self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
  
-                elif keys[pygame.K_RIGHT]:
+                elif keys[pyg.K_RIGHT]:
                     self.dirnx = 1
                     self.dirny = 0
                     self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
  
-                elif keys[pygame.K_UP]:
+                elif keys[pyg.K_UP]:
                     self.dirnx = 0
                     self.dirny = -1
                     self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
  
-                elif keys[pygame.K_DOWN]:
+                elif keys[pyg.K_DOWN]:
                     self.dirnx = 0
                     self.dirny = 1
                     self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
  
         for i, c in enumerate(self.body):
-            p = c.pos[:]
+            p = c.pos[:] # where is my body
             if p in self.turns:
                 turn = self.turns[p]
                 c.move(turn[0],turn[1])
@@ -131,8 +131,8 @@ def drawGrid(w, rows, surface):
         x = x + sizeBtwn
         y = y + sizeBtwn
  
-        pygame.draw.line(surface, (244, 82, 255), (x,0),(x,w))
-        pygame.draw.line(surface, (244, 82, 255), (0,y),(w,y))
+        pyg.draw.line(surface, (244, 82, 255), (x,0),(x,w))
+        pyg.draw.line(surface, (244, 82, 255), (0,y),(w,y))
        
  
 def redrawWindow(surface):
@@ -141,7 +141,7 @@ def redrawWindow(surface):
     s.draw(surface)
     snack.draw(surface)
     drawGrid(width,rows, surface)
-    pygame.display.update()
+    pyg.display.update()
  
  
 def randomSnack(rows, item):
@@ -149,44 +149,46 @@ def randomSnack(rows, item):
     positions = item.body
  
     while True:
-        x = random.randrange(rows)
-        y = random.randrange(rows)
+        x = rnd.randrange(rows)
+        y = rnd.randrange(rows)
         if len(list(filter(lambda z:z.pos == (x,y), positions))) > 0:
             continue
         else:
             break
        
     return (x,y)
- 
- 
+ # seperated my initialization stuff.  this could be cleaner
+def initialize():
+    global width, rows, s, snack, bell, dead, start, flag, win, clock
+    pyg.mixer.init()
+    start = pyg.mixer.Sound("Start.wav")
+    width = 500
+    rows = 20
+    win = pyg.display.set_mode((width, width))
+    s = snake((255, 171, 42), (10,10))
+    snack = cube(randomSnack(rows, s), color=(83, 228, 174))
+    flag = True
+    bell = pyg.mixer.Sound("Token.wav")
+    dead = pyg.mixer.Sound("Dead.wav")
+    clock = pyg.time.Clock()
+    pass
+
 def message_box(subject, content):
     root = tk.Tk()
     root.attributes("-topmost", True)
     root.withdraw()
-    messagebox.showinfo(subject, content)
+    msg.showinfo(subject, content)
     try:
         root.destroy()
     except:
         pass
  
- 
-def main():
-    global width, rows, s, snack, bell, dead, start
-    pygame.mixer.init()
-    start = pygame.mixer.Sound("Start.wav")
-    width = 500
-    rows = 20
-    win = pygame.display.set_mode((width, width))
-    s = snake((255, 171, 42), (10,10))
+ # still need to work this main function but at least its in normal python format now
+if __name__ == "__main__":
+    initialize()
     start.play()
-    snack = cube(randomSnack(rows, s), color=(83, 228, 174))
-    flag = True
-    bell = pygame.mixer.Sound("Token.wav")
-    dead = pygame.mixer.Sound("Dead.wav")
-    clock = pygame.time.Clock()
-   
     while flag:
-        pygame.time.delay(50)
+        pyg.time.delay(50)
         clock.tick(10)
         s.move()
         if s.body[0].pos == snack.pos:
@@ -202,9 +204,6 @@ def main():
                 s.reset((10,10))
                 break
         
-        pygame.display.update()  
+        pyg.display.update()  
         redrawWindow(win)
  
-       
-    pass
-main()
