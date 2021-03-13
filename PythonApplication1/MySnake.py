@@ -6,7 +6,6 @@ import tkinter as tk
 from tkinter import messagebox as msg
  
 class cube(object):
-    
     rows = 20
     w = 500
     def __init__(self,start,dirnx=1,dirny=0,color=(255, 171, 42)):
@@ -86,7 +85,7 @@ class snake(object):
                 elif c.dirny == -1 and c.pos[1] <= 0: c.pos = (c.pos[0],c.rows-1)
                 else: c.move(c.dirnx,c.dirny)
        
- 
+    # new snake 
     def reset(self, pos):
         start.play()
         self.head = cube(pos)
@@ -96,7 +95,7 @@ class snake(object):
         self.dirnx = 0
         self.dirny = 1
  
- 
+
     def addCube(self):
         tail = self.body[-1]
         dx, dy = tail.dirnx, tail.dirny
@@ -113,7 +112,7 @@ class snake(object):
         self.body[-1].dirnx = dx
         self.body[-1].dirny = dy
        
- 
+    # draw the body in the next spot
     def draw(self, surface):
         for i, c in enumerate(self.body):
             if i ==0:
@@ -136,9 +135,9 @@ def drawGrid(w, rows, surface):
        
  
 def redrawWindow(surface):
-    global rows, width, s, snack
+    global rows, width, playerSnake, snack
     surface.fill((0,0,0))
-    s.draw(surface)
+    playerSnake.draw(surface)
     snack.draw(surface)
     drawGrid(width,rows, surface)
     pyg.display.update()
@@ -147,7 +146,6 @@ def redrawWindow(surface):
 def randomSnack(rows, item):
  
     positions = item.body
- 
     while True:
         x = rnd.randrange(rows)
         y = rnd.randrange(rows)
@@ -159,17 +157,20 @@ def randomSnack(rows, item):
     return (x,y)
  # seperated my initialization stuff.  this could be cleaner
 def initialize():
-    global width, rows, s, snack, bell, dead, start, flag, win, clock
-    pyg.mixer.init()
-    start = pyg.mixer.Sound("Start.wav")
+    # asign globals
+    global width, rows, playerSnake, snack, bell, dead, start, flag, win, clock
+    playerSnake = snake((255, 171, 42), (10,10))
+    snack = cube(randomSnack(rows, playerSnake), color=(83, 228, 174))
     width = 500
     rows = 20
-    win = pyg.display.set_mode((width, width))
-    s = snake((255, 171, 42), (10,10))
-    snack = cube(randomSnack(rows, s), color=(83, 228, 174))
     flag = True
+    # sound mixer
+    pyg.mixer.init()
+    start = pyg.mixer.Sound("Start.wav")
+    win = pyg.display.set_mode((width, width))
     bell = pyg.mixer.Sound("Token.wav")
     dead = pyg.mixer.Sound("Dead.wav")
+    # set clock
     clock = pyg.time.Clock()
     pass
 
@@ -186,24 +187,22 @@ def message_box(subject, content):
  # still need to work this main function but at least its in normal python format now
 if __name__ == "__main__":
     initialize()
-    start.play()
+    start.play() # play intro sound
     while flag:
         pyg.time.delay(50)
         clock.tick(10)
-        s.move()
-        if s.body[0].pos == snack.pos:
-            s.addCube()
+        playerSnake.move()
+        if playerSnake.body[0].pos == snack.pos:
+            playerSnake.addCube()
             bell.play()
-            snack = cube(randomSnack(rows, s), color=(83, 228, 174))
- 
-        for x in range(len(s.body)):
-            if s.body[x].pos in list(map(lambda z:z.pos,s.body[x+1:])):
-                dead.play()
-                print("Score: ", len(s.body))
+            snack = cube(randomSnack(rows, playerSnake), color=(83, 228, 174))
+        for x in range(len(playerSnake.body)):
+            if playerSnake.body[x].pos in list(map(lambda z:z.pos,playerSnake.body[x+1:])):
+                dead.play() # you died sound
+                print("Score: ", len(playerSnake.body))  # this is all printing to the python terminal so that should be fixed
                 message_box("You Lost!", "Play again...")
-                s.reset((10,10))
+                playerSnake.reset((10,10))
                 break
-        
         pyg.display.update()  
         redrawWindow(win)
  
