@@ -1,4 +1,3 @@
-# this was one of the first things I made in python.  I'm going to update it and use it to train my ML model for my senior project at fullsail.
 import math
 import random as rnd
 import pygame as pyg
@@ -32,7 +31,7 @@ class cube(object):
             circleMiddle2 = (i*dis + dis -radius*2, j*dis+8)
             pyg.draw.circle(surface, (0,0,0), circleMiddle, radius)
             pyg.draw.circle(surface, (0,0,0), circleMiddle2, radius)
-       
+
 class snake(object):
     body = []
     turns = {}
@@ -156,23 +155,7 @@ def randomSnack(rows, item):
        
     return (x,y)
  # seperated my initialization stuff.  this could be cleaner
-def initialize():
-    # asign globals
-    global width, rows, playerSnake, snack, bell, dead, start, flag, win, clock
-    playerSnake = snake((255, 171, 42), (10,10))
-    snack = cube(randomSnack(rows, playerSnake), color=(83, 228, 174))
-    width = 500
-    rows = 20
-    flag = True
-    # sound mixer
-    pyg.mixer.init()
-    start = pyg.mixer.Sound("Start.wav")
-    win = pyg.display.set_mode((width, width))
-    bell = pyg.mixer.Sound("Token.wav")
-    dead = pyg.mixer.Sound("Dead.wav")
-    # set clock
-    clock = pyg.time.Clock()
-    pass
+
 
 def message_box(subject, content):
     root = tk.Tk()
@@ -186,7 +169,20 @@ def message_box(subject, content):
  
  # still need to work this main function but at least its in normal python format now
 if __name__ == "__main__":
-    initialize()
+    global width, rows, playerSnake, snack, bell, dead, start, flag, win, clock
+    playerSnake = snake((255, 171, 42), (10,10))
+    width = 500
+    rows = 20
+    flag = True
+    snack = cube(randomSnack(rows, playerSnake), color=(83, 228, 174))
+    # sound mixer
+    pyg.mixer.init()
+    start = pyg.mixer.Sound("Start.wav")
+    win = pyg.display.set_mode((width, width))
+    bell = pyg.mixer.Sound("Token.wav")
+    dead = pyg.mixer.Sound("Dead.wav")
+    # set clock
+    clock = pyg.time.Clock()
     start.play() # play intro sound
     while flag:
         pyg.time.delay(50)
@@ -205,4 +201,3 @@ if __name__ == "__main__":
                 break
         pyg.display.update()  
         redrawWindow(win)
- 
